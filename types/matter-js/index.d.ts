@@ -412,10 +412,7 @@ declare namespace Matter {
         */
         type?: string;
         /**
-         * A `Vector` that _measures_ the current velocity of the body after the last `Body.update`. It is read-only.
-         * If you need to modify a body's velocity directly, you should either apply a force or simply change the body's `position` (as the engine uses position-Verlet integration).
-         *
-        * @readOnly
+         * A `Vector` that _measures_ th1000
         * @property velocity
         * @type vector
         * @default { x: 0, y: 0 }
@@ -568,6 +565,24 @@ declare namespace Matter {
         * @default 1
         */
         yScale: number;
+
+        /**
+         * A `Number` that defines the offset in the x-axis for the sprite (normalised by texture width).
+         *
+        * @property render.sprite.xOffset
+        * @type number
+        * @default 1
+        */
+        xOffset: number;
+
+        /**
+         * A `Number` that defines the offset in the y-axis for the sprite (normalised by texture height).
+         *
+        * @property render.sprite.yOffset
+        * @type number
+        * @default 1
+        */
+        yOffset: number;
     }
 
     /**
@@ -1049,7 +1064,7 @@ declare namespace Matter {
         * @property vertices
         * @type vector[]
         */
-        vertices: Array<Vector>;
+        vertices: Array<Vertex>;
         /**
          * An array of bodies that make up this body.
          * The first body in the array must always be a self reference to the current body instance.
@@ -1298,7 +1313,7 @@ declare namespace Matter {
          * @param {composite} composite
          * @return {constraint[]} All the constraints
          */
-        static allConstraints(composite: Composite): Array<Composite>;
+        static allConstraints(composite: Composite): Array<Constraint>;
 
         /**
          * Removes all bodies, constraints and composites from the given composite.
@@ -2069,6 +2084,14 @@ declare namespace Matter {
         enableSleeping: boolean;
 
         /**
+         * A Metrics instance for debugging purpose
+         * 
+         * @property metrics
+         * @type Metrics
+         */
+        metrics?: Metrics;
+
+        /**
          * Collision pair set for this `Engine`.
          */
         pairs: any;
@@ -2160,6 +2183,13 @@ declare namespace Matter {
          */
         static clear(grid: Grid): void;
 
+        /**
+         * A back-reference to the `Matter.Grid` module.
+         *
+        * @property controller
+        * @type render
+        */
+        controller: typeof Grid;
 
         /**
          * The width of a single grid bucket.
@@ -2910,6 +2940,31 @@ declare namespace Matter {
          * @return {vector} A new vector of vectorA and vectorB subtracted
          */
         static sub(vectorA: Vector, vectorB: Vector, optional?: Vector): Vector;
+    }
+
+    export interface Vertex {
+        /**
+         * The x coordinate of the inner vector
+         */
+        x: number;
+
+        /**
+         * The y coordinate of the inner vector
+         */
+        y: number;
+
+        /**
+         * A property which specifies if the vertex represents two coincident edges
+         */
+        isInternal: boolean;
+
+        /**
+         * An object which specifies contact properties of the vertex
+         */
+        contact: {
+            normalImpulse: number,
+            tangentImpulse: number
+        }
     }
 
     /**

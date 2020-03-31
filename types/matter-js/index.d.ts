@@ -966,8 +966,17 @@ declare namespace Matter {
          *
         * @property position
         * @type vector
-        * @default { x: 0, y:      */
+        * @default { x: 0, y: 0 }
+        */
         position: Vector;
+        /**
+         * A `Vector` that specifies the previous world-space position of the body.
+         *
+        * @property positionPrev
+        * @type vector
+        * @default { x: 0, y: 0 }
+        */
+        positionPrev: Vector;
         /**
          * An `Object` that defines the rendering properties to be consumed by the module `Matter.Render`.
         *
@@ -1495,6 +1504,13 @@ declare namespace Matter {
         * @default "composite"
         */
         type: String;
+
+        /**
+         * An object reserved for storing plugin-specific properties.
+         *
+         * @property plugin
+         */
+        plugin: any;
 
     }
 
@@ -2147,6 +2163,9 @@ declare namespace Matter {
         world: World;
     }
 
+    export interface Buckets {
+        [index: string]: Array<Body>;
+    }
 
     export interface IGridDefinition {
 
@@ -2190,6 +2209,14 @@ declare namespace Matter {
         * @type render
         */
         controller: typeof Grid;
+
+        /**
+         * The buckets that compose the grid.
+         * 
+         * @property buckets
+         * @type Buckets
+         */
+        buckets: Buckets;
 
         /**
          * The width of a single grid bucket.
@@ -2338,16 +2365,24 @@ declare namespace Matter {
         static clear(pairs: any): any;
     }
 
-    export interface IPair {
+    export interface Contact {
+        vertex: Vertex;
+        normalImpulse: number;
+        tangentImpulse: number;
+    }
+
+    export class Pair {
         id: number;
         bodyA: Body;
         bodyB: Body;
-        contacts: any;
-        activeContacts: any;
+        activeContacts: Array<Contact>;
         separation: number;
         isActive: boolean;
+        confirmedActive: boolean;
+        isSensor: boolean;
         timeCreated: number;
-        timeUpdated: number,
+        timeUpdated: number;
+        collision: any;
         inverseMass: number;
         friction: number;
         frictionStatic: number;
@@ -2961,10 +2996,7 @@ declare namespace Matter {
         /**
          * An object which specifies contact properties of the vertex
          */
-        contact: {
-            normalImpulse: number,
-            tangentImpulse: number
-        }
+        contact: Contact;
     }
 
     /**
@@ -3258,7 +3290,7 @@ declare namespace Matter {
         /**
          * The collision pair
          */
-        pairs: Array<IPair>;
+        pairs: Array<Pair>;
     }
 
     export interface IMouseEvent<T> extends IEvent<T> {
